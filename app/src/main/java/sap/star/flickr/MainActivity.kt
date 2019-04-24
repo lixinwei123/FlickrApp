@@ -1,5 +1,8 @@
 package sap.star.flickr
 
+import android.location.Criteria
+import android.net.Uri
+import android.nfc.NdefRecord.createUri
 import android.nfc.Tag
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -19,13 +22,29 @@ class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete, GetFlic
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne","android,oreo","en-us",true)
         val getRawData = GetRawData(this) //create a class instance
 
         //getRawData.setDownloadCompleteListener(this) //put a listener on this file
-        getRawData.execute("https://api.flickr.com/services/feeds/photos_public.gne?tagmode=any&format=json&nojsoncallback=1")
-
+        getRawData.execute(url)
+        Log.d(TAG,"onCreate ends")
+ //https://api.flickr.com/services/feeds/photos_public.gne?tagmode=any&format=json&nojsoncallback=1
 
         Log.d(TAG,"onCreate ends")
+    }
+
+
+    //this function allows you create a URL with the parameters of the function as the arguments
+    private fun createUri(baseURL: String, searchCriteria: String, lang: String, matchAll: Boolean): String {
+        Log.d(TAG,".createUri starts")
+        return Uri.parse(baseURL).
+            buildUpon().
+            appendQueryParameter("tags",searchCriteria).
+            appendQueryParameter("tagmode", if (matchAll) "ALL" else "ANY").
+            appendQueryParameter("lang",lang).
+            appendQueryParameter("format","json").
+            appendQueryParameter("nojsoncallback","1").
+            build().toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
