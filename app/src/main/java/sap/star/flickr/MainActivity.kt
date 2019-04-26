@@ -1,5 +1,6 @@
 package sap.star.flickr
 
+import android.content.Intent
 import android.location.Criteria
 import android.net.Uri
 import android.nfc.NdefRecord.createUri
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -27,11 +29,11 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete, GetFlickrJso
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 //        setSupportActionBar(toolbar)
-
-        recycler_view.layoutManager = LinearLayoutManager(this)
+        activateToolbar(false)
+        recycler_view.layoutManager = LinearLayoutManager(this) as RecyclerView.LayoutManager?
         recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this,recycler_view,this))
         recycler_view.adapter = flickrRecyclerViewAdapter
-        val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne","android,oreo","en-us",true)
+        val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne","dogs","en-us",true)
         val getRawData = GetRawData(this) //create a class instance
 
         //getRawData.setDownloadCompleteListener(this) //put a listener on this file
@@ -50,7 +52,13 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete, GetFlickrJso
 
     override fun onItemLongClick(view: View, position: Int) {
         Log.d(TAG, "onItenLongClick: starts")
-        Toast.makeText(this, "Long tap at position $position", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this, "Long tap at position $position", Toast.LENGTH_SHORT).show()
+        val photo = flickrRecyclerViewAdapter.getPhoto(position)
+        if (photo != null) {
+            val intent = Intent(this, PhotoDetailsActivity:: class.java)
+            intent.putExtra(PHOTO_TRANSFER, photo)
+            startActivity(intent)
+        }
     }
 
     //this function allows you create a URL with the parameters of the function as the arguments
